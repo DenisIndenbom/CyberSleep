@@ -159,8 +159,8 @@ public class PlayerListener implements Listener
         recipientPlayer.sendMessage(formatText.format(text));
     }
 
-    private void sendMessage(Player recipientPlayer, String text, String var, String replacedWord)
+    private void sendMessage(Player recipientPlayer, String text, String var, String replacement)
     {
-        recipientPlayer.sendMessage(formatText.format(text, var, replacedWord));
+        recipientPlayer.sendMessage(formatText.format(text, var, replacement));
     }
 }
