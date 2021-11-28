@@ -65,14 +65,14 @@ public class CyberSleepPlugin extends JavaPlugin
         Objects.requireNonNull(getCommand("help")).setExecutor(
                 new HelpCommand(getConfig().getString("messages.helpMessage")));
         Objects.requireNonNull(getCommand("reload")).setExecutor(
-                new ReloadCommand(getName(), getConfig().getString("messages.reloadMessage")));
+                new ReloadCommand(getConfig().getString("messages.reloadMessage"), this));
 
         // initialize listeners
         this.playerListener = new PlayerListener(getConfig().getString("messages.enterBedMessage"),
                                                  getConfig().getString("messages.exitBedMessage"),
                                                  getConfig().getString("sleeping_bar.title"),
                                                  Objects.requireNonNull(getConfig().getString("sleeping_bar.color")),
-                                                 getConfig().getDouble("max_percent_of_sleeping_players"));
+                                                 getConfig().getDouble("max_percent_of_sleeping_players"), this);
 
         // registering listeners in the handler
         getServer().getPluginManager().registerEvents(this.playerListener, this);

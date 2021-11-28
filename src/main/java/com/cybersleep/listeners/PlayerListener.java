@@ -1,6 +1,8 @@
 package com.cybersleep.listeners;
 
+import com.cybersleep.CyberSleepPlugin;
 import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -19,6 +21,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class PlayerListener implements Listener
 {
+    private final CyberSleepPlugin plugin;
+
     private final String enterBedMessage;
     private final String exitBedMessage;
 
@@ -29,14 +33,16 @@ public class PlayerListener implements Listener
     private long sleepingPlayersNum = 0;
     private long maxSleepingPlayers = 0;
 
+    private boolean skippingNight = false;
+
     private final BarColor sleepingBarColor;
     private final String sleepingBarTitle;
     private final BossBar sleepingBar;
 
-    final FormatText formatText = new FormatText();
+    private final FormatText formatText = new FormatText();
 
     public PlayerListener(String enterBedMessage, String exitBedMessage, String sleepingBarTitle,
-                          String sleepingBarColor, double percentagePlayersToSkipNight)
+                          String sleepingBarColor, double percentagePlayersToSkipNight, CyberSleepPlugin plugin)
     {
         this.enterBedMessage = enterBedMessage;
         this.exitBedMessage = exitBedMessage;
@@ -57,6 +63,8 @@ public class PlayerListener implements Listener
 
         // create sleepingBar
         this.sleepingBar = Bukkit.createBossBar("Sleeping", this.sleepingBarColor, BarStyle.SOLID);
+
+        this.plugin = plugin;
     }
 
     @EventHandler
@@ -96,8 +104,9 @@ public class PlayerListener implements Listener
 
         updateSleepingBar();
 
-        if (this.maxSleepingPlayers <= this.sleepingPlayersNum)
+        if (this.maxSleepingPlayers <= this.sleepingPlayersNum && !this.skippingNight)
         {
+            this.skippingNight = true;
             skipNight(player.getWorld());
         }
     }
@@ -136,9 +145,17 @@ public class PlayerListener implements Listener
         if (this.maxSleepingPlayers <= 0) this.maxSleepingPlayers = 1;
     }
 
-    private void skipNight(@NotNull World world)
+    private void skipNight(World world)
     {
-        world.setTime(this.morning);
+        new BukkitRunnable()
+        {
+            @Override
+            public void run()
+            {
+                world.setTime(morning);
+                skippingNight = false;
+            }
+        }.runTaskLater(plugin, 100);
     }
 
     private void updateSleepingBar()
