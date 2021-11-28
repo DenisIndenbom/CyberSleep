@@ -1,0 +1,13 @@
+name: CyberSleepPlugin
+version: 1.0.1
+main: com.cybersleep.CyberSleepPlugin
+
+prefix: CyberSleep
+authors: [DenisIndenbom]
+description: Description
+
+commands:
+  help:
+    usage: /help
+  reload:
+    usage: /reload

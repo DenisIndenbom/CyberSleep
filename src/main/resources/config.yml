@@ -1,0 +1,15 @@
+# <playerName> - имя игрока
+# c - ключевой знак для указания цвета текста
+
+# сообщения
+messages:
+  helpMessage: This is a c5 CyberSleepPlugin. cf The plugin helps to skip boring nights!
+  enterBedMessage: c7Good night <playerName>!
+  exitBedMessage: c7Good morning <playerName>!
+  reloadMessage: c5CyberSleepPlugin cf reloaded!
+
+sleeping_bar:
+  title: c9Sleeping
+  color: blue
+
+max_percent_of_sleeping_players: 0.3 # диопозон от 0 до 1
