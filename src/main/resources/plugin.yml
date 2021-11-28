@@ -4,7 +4,7 @@ main: com.cybersleep.CyberSleepPlugin
 
 prefix: CyberSleep
 authors: [DenisIndenbom]
-description: Description
+description: This is a CyberSleepPlugin. The plugin helps to skip boring nights!
 
 commands:
   help:
