@@ -3,10 +3,10 @@
 
 # сообщения
 messages:
-  helpMessage: This is a c5 CyberSleepPlugin. cf The plugin helps to skip boring nights!
+  helpMessage: This is a c5CyberSleepPlugin. cfThe plugin helps to skip boring nights!
   enterBedMessage: c7Good night <playerName>!
   exitBedMessage: c7Good morning <playerName>!
-  reloadMessage: c5CyberSleepPlugin cf reloaded!
+  reloadMessage: c5CyberSleepPlugin cfreloaded!
 
 sleeping_bar:
   title: c9Sleeping
