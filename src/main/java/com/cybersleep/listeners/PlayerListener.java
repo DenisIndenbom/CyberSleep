@@ -1,6 +1,8 @@
 package com.cybersleep.listeners;
 
 import com.cybersleep.CyberSleepPlugin;
+import com.cybersleep.formattext.FormatText;
+
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.World;
@@ -14,7 +16,6 @@ import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import com.cybersleep.formattext.FormatText;
 
 import org.bukkit.event.EventHandler;
 import org.jetbrains.annotations.NotNull;
@@ -62,7 +63,7 @@ public class PlayerListener implements Listener
         }
 
         // create sleepingBar
-        this.sleepingBar = Bukkit.createBossBar("Sleeping", this.sleepingBarColor, BarStyle.SOLID);
+        this.sleepingBar = Bukkit.createBossBar(this.sleepingBarTitle, this.sleepingBarColor, BarStyle.SOLID);
 
         this.plugin = plugin;
     }
@@ -91,23 +92,28 @@ public class PlayerListener implements Listener
 
         // take the player's class
         Player player = event.getPlayer();
+        // take world
+        World world = player.getWorld();
         // send message
-        sendMessage(player, this.enterBedMessage, player.getName(), "<playerName>");
+        this.sendMessage(player, this.enterBedMessage, player.getName(), "<playerName>");
         // add players to display sleeping bar
-        if (sleepingBar.getPlayers().size() == 0)
-            for (Player p : player.getWorld().getPlayers()) this.sleepingBar.addPlayer(p);
+        if (sleepingBar.getPlayers().size() == 0 && world.getTime() >= this.night)
+            for (Player p : world.getPlayers()) this.sleepingBar.addPlayer(p);
 
-        if (this.maxSleepingPlayers <= 0) updateMaxSleepingPlayers(player.getWorld().getPlayers().size());
+        if (this.maxSleepingPlayers <= 0) this.updateMaxSleepingPlayers(world.getPlayers().size());
 
         // add sleeping player
         this.sleepingPlayersNum += 1;
 
-        updateSleepingBar();
+        this.updateSleepingBar();
 
         if (this.maxSleepingPlayers <= this.sleepingPlayersNum && !this.skippingNight)
         {
             this.skippingNight = true;
-            skipNight(player.getWorld());
+
+            this.removeSleepingBarWithDelay(30);
+
+            this.skipNight(world);
         }
     }
 
@@ -117,20 +123,24 @@ public class PlayerListener implements Listener
         // return void if event is cancelled
         if (event.isCancelled()) return;
 
+        // take player`s class
         Player player = event.getPlayer();
+        // take world
+        World world = player.getWorld();
+
         // sub sleeping player
         if (this.sleepingPlayersNum > 0) this.sleepingPlayersNum -= 1;
 
-        if (this.maxSleepingPlayers <= 0) updateMaxSleepingPlayers(player.getWorld().getPlayers().size());
+        if (this.maxSleepingPlayers <= 0) this.updateMaxSleepingPlayers(world.getPlayers().size());
 
-        if ((player.getWorld().getTime() <= this.night) && (player.getWorld().getTime() >= this.morning))
+        if ((world.getTime() >= this.morning) && (world.getTime() <= this.night))
         {
-            if (sleepingPlayersNum == 0) this.sleepingBar.removeAll();
-            sendMessage(player, this.exitBedMessage, player.getName(), "<playerName>");
+            this.sendMessage(player, this.exitBedMessage, player.getName(), "<playerName>");
         }
+        else if (this.sleepingPlayersNum == 0 && !this.skippingNight) this.removeSleepingBarWithDelay(200);
 
         // update sleeping bar progress
-        updateSleepingBar();
+        this.updateSleepingBar();
     }
 
     public void disable()
@@ -158,6 +168,18 @@ public class PlayerListener implements Listener
         }.runTaskLater(plugin, 100);
     }
 
+    private void removeSleepingBarWithDelay(long delay)
+    {
+        new BukkitRunnable()
+        {
+            @Override
+            public void run()
+            {
+                if (sleepingPlayersNum == 0) sleepingBar.removeAll();
+            }
+        }.runTaskLater(plugin, delay);
+    }
+
     private void updateSleepingBar()
     {
         try
@@ -173,11 +195,11 @@ public class PlayerListener implements Listener
 
     private void sendMessage(Player recipientPlayer, String text)
     {
-        recipientPlayer.sendMessage(formatText.format(text));
+        recipientPlayer.sendMessage(this.formatText.format(text));
     }
 
     private void sendMessage(Player recipientPlayer, String text, String var, String replacement)
     {
-        recipientPlayer.sendMessage(formatText.format(text, var, replacement));
+        recipientPlayer.sendMessage(this.formatText.format(text, var, replacement));
     }
 }
