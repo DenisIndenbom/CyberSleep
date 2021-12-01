@@ -28,14 +28,14 @@ public class ReloadCommand implements CommandExecutor
     {
         if (!sender.isOp())
         {
-            this.messageSender.sendMessage(sender, ChatColor.RED + "Sorry, you don't have permissions to reload plugin!");
+            this.messageSender.sendMessage(sender, ChatColor.RED + "<c5>[CyberSleepPlugin] <c4>Sorry, you don't have permissions to reload plugin!");
             return false;
         }
 
-        boolean result  = plugin.reloadPlugin();
+        boolean result = plugin.reloadPlugin();
 
         if (result) this.messageSender.sendMessage(sender, this.reloadMessage);
-        else this.messageSender.sendMessage(sender, "Error: The plugin reload failed. Perhaps config.yml has syntax errors!");
+        else this.messageSender.sendMessage(sender, "<c5>[CyberSleepPlugin] <c4>Error: The plugin reload failed. Perhaps config.yml has syntax errors!");
 
         return true;
     }

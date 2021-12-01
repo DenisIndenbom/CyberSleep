@@ -1,7 +1,7 @@
 package com.cybersleep;
 
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.event.HandlerList;
 
 import com.cybersleep.listeners.PlayerListener;
 import com.cybersleep.commands.HelpCommand;
@@ -36,9 +36,7 @@ public class CyberSleepPlugin extends JavaPlugin
     @Override
     public void onDisable()
     {
-        this.playerListener.disable();
-
-        HandlerList.unregisterAll();
+        this.disablePlugin();
     }
 
     public boolean reloadPlugin()
@@ -46,15 +44,13 @@ public class CyberSleepPlugin extends JavaPlugin
         try
         {
             // reload config
-            reloadConfig();
-            // disable listeners
-            this.playerListener.disable();
-            // unregister all
-            HandlerList.unregisterAll();
+            this.reloadConfig();
+            this.disablePlugin();
             // load plugin
-            loadPlugin();
+            this.loadPlugin();
         }
-        catch (Exception ignored){return false;}
+        catch (Exception ignored)
+        {return false;}
 
         return true;
     }
@@ -62,19 +58,26 @@ public class CyberSleepPlugin extends JavaPlugin
     public void loadPlugin()
     {
         // registering commands in the handler
-        Objects.requireNonNull(getCommand("help")).setExecutor(
-                new HelpCommand(getConfig().getString("messages.helpMessage")));
-        Objects.requireNonNull(getCommand("reload")).setExecutor(
-                new ReloadCommand(getConfig().getString("messages.reloadMessage"), this));
+        Objects.requireNonNull(this.getCommand("help")).setExecutor(
+                new HelpCommand(this.getConfig().getString("messages.helpMessage")));
+        Objects.requireNonNull(this.getCommand("reload")).setExecutor(
+                new ReloadCommand(this.getConfig().getString("messages.reloadMessage"), this));
 
         // initialize listeners
-        this.playerListener = new PlayerListener(getConfig().getString("messages.enterBedMessage"),
-                                                 getConfig().getString("messages.exitBedMessage"),
-                                                 getConfig().getString("sleeping_bar.title"),
-                                                 Objects.requireNonNull(getConfig().getString("sleeping_bar.color")),
-                                                 getConfig().getDouble("max_percent_of_sleeping_players"), this);
+        this.playerListener = new PlayerListener(this.getConfig().getString("messages.enterBedMessage"),
+                                                 this.getConfig().getString("messages.exitBedMessage"),
+                                                 this.getConfig().getString("sleeping_bar.title"),
+                                                 Objects.requireNonNull(this.getConfig().getString("sleeping_bar.color")),
+                                                 this.getConfig().getDouble("max_percent_of_sleeping_players"), this);
 
         // registering listeners in the handler
-        getServer().getPluginManager().registerEvents(this.playerListener, this);
+        this.getServer().getPluginManager().registerEvents(this.playerListener, this);
+    }
+
+    private void disablePlugin()
+    {
+        // disable listeners
+        this.playerListener.disable();
+        PlayerInteractEvent.getHandlerList().unregister(this.playerListener);
     }
 }
