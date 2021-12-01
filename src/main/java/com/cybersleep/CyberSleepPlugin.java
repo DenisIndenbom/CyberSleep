@@ -1,7 +1,7 @@
 package com.cybersleep;
 
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.event.HandlerList;
 
 import com.cybersleep.listeners.PlayerListener;
 import com.cybersleep.commands.HelpCommand;
@@ -45,6 +45,7 @@ public class CyberSleepPlugin extends JavaPlugin
         {
             // reload config
             this.reloadConfig();
+            // disable plugin
             this.disablePlugin();
             // load plugin
             this.loadPlugin();
@@ -78,6 +79,7 @@ public class CyberSleepPlugin extends JavaPlugin
     {
         // disable listeners
         this.playerListener.disable();
-        PlayerInteractEvent.getHandlerList().unregister(this.playerListener);
+        HandlerList.unregisterAll(this.playerListener);
+        this.playerListener = null;
     }
 }
