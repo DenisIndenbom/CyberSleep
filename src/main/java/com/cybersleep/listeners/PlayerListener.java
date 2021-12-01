@@ -92,12 +92,15 @@ public class PlayerListener implements Listener
 
         // take the player's class
         Player player = event.getPlayer();
+
         // take world
         World world = player.getWorld();
+
         // send message
         this.sendMessage(player, this.enterBedMessage, player.getName(), "<playerName>");
+
         // add players to display sleeping bar
-        if (sleepingBar.getPlayers().size() == 0 && world.getTime() >= this.night)
+        if (sleepingBar.getPlayers().size() == 0 && world.getTime() >= this.night && !this.skippingNight)
             for (Player p : world.getPlayers()) this.sleepingBar.addPlayer(p);
 
         if (this.maxSleepingPlayers <= 0) this.updateMaxSleepingPlayers(world.getPlayers().size());
@@ -107,6 +110,7 @@ public class PlayerListener implements Listener
 
         this.updateSleepingBar();
 
+        // skip night
         if (this.maxSleepingPlayers <= this.sleepingPlayersNum && !this.skippingNight)
         {
             this.skippingNight = true;
@@ -175,7 +179,7 @@ public class PlayerListener implements Listener
             @Override
             public void run()
             {
-                if (sleepingPlayersNum == 0) sleepingBar.removeAll();
+                if (sleepingPlayersNum == 0 || skippingNight) sleepingBar.removeAll();
             }
         }.runTaskLater(plugin, delay);
     }
