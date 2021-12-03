@@ -59,9 +59,9 @@ public class CyberSleepPlugin extends JavaPlugin
     public void loadPlugin()
     {
         // registering commands in the handler
-        Objects.requireNonNull(this.getCommand("help")).setExecutor(
+        Objects.requireNonNull(this.getCommand("about_cybersleep")).setExecutor(
                 new HelpCommand(this.getConfig().getString("messages.helpMessage")));
-        Objects.requireNonNull(this.getCommand("reload")).setExecutor(
+        Objects.requireNonNull(this.getCommand("reload_cybersleep")).setExecutor(
                 new ReloadCommand(this.getConfig().getString("messages.reloadMessage"), this));
 
         // initialize listeners
