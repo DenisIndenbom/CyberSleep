@@ -15,6 +15,8 @@ public class CyberSleepPlugin extends JavaPlugin
     // player listener
     private PlayerListener playerListener;
 
+    private final int currentConfigVersion = 1;
+
     @Override
     public void onLoad()
     {saveDefaultConfig();}
@@ -65,12 +67,14 @@ public class CyberSleepPlugin extends JavaPlugin
         Objects.requireNonNull(this.getCommand("reload_cybersleep")).setExecutor(
                 new ReloadCommand(this.getConfig().getString("messages.reloadMessage"), this));
 
+
         // initialize listeners
         this.playerListener = new PlayerListener(this.getConfig().getString("messages.enterBedMessage"),
                                                  this.getConfig().getString("messages.exitBedMessage"),
                                                  this.getConfig().getString("sleeping_bar.title"),
                                                  Objects.requireNonNull(this.getConfig().getString("sleeping_bar.color")),
-                                                 this.getConfig().getDouble("max_percent_of_sleeping_players"), this);
+                                                 this.getConfig().getDouble("max_percent_of_sleeping_players"),
+                                                 this);
 
         // registering listeners in the handler
         this.getServer().getPluginManager().registerEvents(this.playerListener, this);

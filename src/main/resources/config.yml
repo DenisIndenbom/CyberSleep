@@ -1,6 +1,9 @@
 # <playerName> - player name
 # <c > - text color
 
+# config version
+config_version: 1
+
 # messages
 messages:
   helpMessage: This is a <c5>CyberSleepPlugin. <cf>The plugin helps to skip boring nights!
@@ -11,5 +14,6 @@ messages:
 sleeping_bar:
   title: <c9>Sleeping
   color: blue
+
 
 max_percent_of_sleeping_players: 0.3 # диопозон от 0 до 1

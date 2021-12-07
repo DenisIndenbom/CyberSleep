@@ -35,6 +35,7 @@ public class PlayerListener implements Listener
     private long maxSleepingPlayers = 0;
 
     private boolean skippingNight = false;
+    private boolean thunder = false;
 
     private final BarColor sleepingBarColor;
     private final String sleepingBarTitle;
@@ -72,16 +73,14 @@ public class PlayerListener implements Listener
     public void onPlayerJoin(@NotNull PlayerJoinEvent event)
     {
         // calculate the number of sleeping players needed to skip the night
-        this.maxSleepingPlayers = (int) ((event.getPlayer().getWorld().getPlayers().size() + 1) * this.percentagePlayersToSkipNight);
-        if (this.maxSleepingPlayers <= 0) this.maxSleepingPlayers = 1;
+        this.updateMaxSleepingPlayers(event.getPlayer().getWorld().getPlayers().size() + 1);
     }
 
     @EventHandler
     public void onPlayerQuit(@NotNull PlayerQuitEvent event)
     {
         // calculate the number of sleeping players needed to skip the night
-        this.maxSleepingPlayers = (int) ((event.getPlayer().getWorld().getPlayers().size() - 1) * this.percentagePlayersToSkipNight);
-        if (this.maxSleepingPlayers <= 0) this.maxSleepingPlayers = 1;
+        this.updateMaxSleepingPlayers(event.getPlayer().getWorld().getPlayers().size() - 1);
     }
 
     @EventHandler
@@ -100,7 +99,7 @@ public class PlayerListener implements Listener
         this.sendMessage(player, this.enterBedMessage, player.getName(), "<playerName>");
 
         // add players to display sleeping bar
-        if (sleepingBar.getPlayers().size() == 0 && world.getTime() >= this.night && !this.skippingNight)
+        if (sleepingBar.getPlayers().size() == 0 && (!this.skippingNight || !world.isClearWeather()))
             for (Player p : world.getPlayers()) this.sleepingBar.addPlayer(p);
 
         if (this.maxSleepingPlayers <= 0) this.updateMaxSleepingPlayers(world.getPlayers().size());
@@ -114,6 +113,8 @@ public class PlayerListener implements Listener
         if (this.maxSleepingPlayers <= this.sleepingPlayersNum && !this.skippingNight)
         {
             this.skippingNight = true;
+
+            this.thunder = !world.isClearWeather();
 
             this.removeSleepingBarWithDelay(30);
 
@@ -137,10 +138,7 @@ public class PlayerListener implements Listener
 
         if (this.maxSleepingPlayers <= 0) this.updateMaxSleepingPlayers(world.getPlayers().size());
 
-        if ((world.getTime() >= this.morning) && (world.getTime() <= this.night))
-        {
-            this.sendMessage(player, this.exitBedMessage, player.getName(), "<playerName>");
-        }
+        if ((world.getTime() >= this.morning) && (world.getTime() <= this.night)) this.sendMessage(player, this.exitBedMessage, player.getName(), "<playerName>");
         else if (this.sleepingPlayersNum == 0 && !this.skippingNight) this.removeSleepingBarWithDelay(200);
 
         // update sleeping bar progress
@@ -167,6 +165,7 @@ public class PlayerListener implements Listener
             public void run()
             {
                 world.setTime(morning);
+                if (thunder) world.setStorm(false);
                 skippingNight = false;
             }
         }.runTaskLater(plugin, 100);
