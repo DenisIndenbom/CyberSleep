@@ -15,8 +15,6 @@ public class CyberSleepPlugin extends JavaPlugin
     // player listener
     private PlayerListener playerListener;
 
-    private final int currentConfigVersion = 1;
-
     @Override
     public void onLoad()
     {saveDefaultConfig();}
