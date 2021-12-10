@@ -168,7 +168,7 @@ public class PlayerListener implements Listener
                 if (thunder) world.setStorm(false);
                 skippingNight = false;
             }
-        }.runTaskLater(plugin, 100);
+        }.runTaskLater(this.plugin, 100);
     }
 
     private void removeSleepingBarWithDelay(long delay)
@@ -180,7 +180,7 @@ public class PlayerListener implements Listener
             {
                 if (sleepingPlayersNum == 0 || skippingNight) sleepingBar.removeAll();
             }
-        }.runTaskLater(plugin, delay);
+        }.runTaskLater(this.plugin, delay);
     }
 
     private void updateSleepingBar()
