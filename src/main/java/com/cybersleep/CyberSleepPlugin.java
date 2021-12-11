@@ -17,20 +17,20 @@ public class CyberSleepPlugin extends JavaPlugin
 
     @Override
     public void onLoad()
-    {saveDefaultConfig();}
+    {this.saveDefaultConfig();}
 
     @Override
     public void onEnable()
     {
         try
         {
-            loadPlugin();
-            getLogger().info("CyberSleep is enable!");
+            this.loadPlugin();
+            this.getLogger().info("CyberSleep is enable!");
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            getLogger().warning("An error occurred when launching the plugin! The plugin is not running! Please check for config.yml syntax errors!");
+            this.getLogger().warning("An error occurred when launching the plugin! The plugin is not running! Please check for config.yml syntax errors!");
         }
     }
 
