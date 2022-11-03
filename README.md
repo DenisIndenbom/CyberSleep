@@ -40,8 +40,7 @@ messages:
 
 sleeping_bar:
   title: <c9>Sleeping
-  color: blue
+  color: blue # blue, red, yellow, green, pink, purple - available colors
 
-
-max_percent_of_sleeping_players: 0.3 # диопозон от 0 до 1
+max_percent_of_sleeping_players: 0.3 # range from 0 to 1
 ```
