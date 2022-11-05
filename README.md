@@ -1,4 +1,4 @@
-# CyberSleepPlugin
+# CyberSleep
 CyberSleep is a plugin for skipping boring nights.
 
 When a certain percentage (for example, 40%) of players are asleep, the plugin skips the night.
