@@ -1,85 +1,54 @@
 package com.cybersleep.listeners;
 
-import com.cybersleep.CyberSleepPlugin;
-import com.cybersleep.formattext.FormatText;
+import com.cybersleep.SleepManagement.SleepManager;
+import com.cybersleep.utils.MessageSender;
 
-import org.bukkit.Bukkit;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.World;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
-import org.bukkit.boss.BossBar;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import org.bukkit.event.EventHandler;
 import org.jetbrains.annotations.NotNull;
+
 
 public class PlayerListener implements Listener
 {
-    private final CyberSleepPlugin plugin;
+    private final SleepManager sleepManager;
+    private final MessageSender messageSender = new MessageSender();
 
     private final String enterBedMessage;
     private final String exitBedMessage;
 
-    private final long morning = 0;
-    private final long night = 13000;
-
-    private final double percentagePlayersToSkipNight;
-    private long sleepingPlayersNum = 0;
-    private long maxSleepingPlayers = 0;
-
-    private boolean skippingNight = false;
-    private boolean thunder = false;
-
-    private final BarColor sleepingBarColor;
-    private final String sleepingBarTitle;
-    private final BossBar sleepingBar;
-
-    private final FormatText formatText = new FormatText();
-
-    public PlayerListener(String enterBedMessage, String exitBedMessage, String sleepingBarTitle,
-                          String sleepingBarColor, double percentagePlayersToSkipNight, CyberSleepPlugin plugin)
+    public PlayerListener(SleepManager sleepManager, FileConfiguration config)
     {
-        this.enterBedMessage = enterBedMessage;
-        this.exitBedMessage = exitBedMessage;
+        this.sleepManager = sleepManager;
 
-        this.sleepingBarTitle = formatText.format(sleepingBarTitle);
-        this.percentagePlayersToSkipNight = percentagePlayersToSkipNight;
-
-        switch (sleepingBarColor)
-        {
-            case "blue" -> this.sleepingBarColor = BarColor.BLUE;
-            case "red" -> this.sleepingBarColor = BarColor.RED;
-            case "yellow" -> this.sleepingBarColor = BarColor.YELLOW;
-            case "green" -> this.sleepingBarColor = BarColor.GREEN;
-            case "pink" -> this.sleepingBarColor = BarColor.PINK;
-            case "purple" -> this.sleepingBarColor = BarColor.PURPLE;
-            default -> this.sleepingBarColor = BarColor.WHITE;
-        }
-
-        // create sleepingBar
-        this.sleepingBar = Bukkit.createBossBar(this.sleepingBarTitle, this.sleepingBarColor, BarStyle.SOLID);
-
-        this.plugin = plugin;
+        this.enterBedMessage = config.getString("messages.enter_bed_message");
+        this.exitBedMessage = config.getString("messages.exit_bed_message");
     }
 
     @EventHandler
-    public void onPlayerJoin(@NotNull PlayerJoinEvent event)
+    public void onPLayerLogin(PlayerLoginEvent event)
     {
-        // calculate the number of sleeping players needed to skip the night
-        this.updateMaxSleepingPlayers(event.getPlayer().getWorld().getPlayers().size() + 1);
+        Player player = event.getPlayer();
+
+        this.sleepManager.setPlayers(player.getWorld().getPlayers().size() + 1);
+        this.sleepManager.updateSleepingBar();
+
+        if (this.sleepManager.isShowSleepingBar() && this.sleepManager.isValidTimeToSleep(player.getWorld()))
+            this.sleepManager.showSleepingBar(player);
     }
 
     @EventHandler
-    public void onPlayerQuit(@NotNull PlayerQuitEvent event)
+    public void onPlayerQuit(PlayerQuitEvent event)
     {
-        // calculate the number of sleeping players needed to skip the night
-        this.updateMaxSleepingPlayers(event.getPlayer().getWorld().getPlayers().size() - 1);
+        this.sleepManager.setPlayers(event.getPlayer().getWorld().getPlayers().size() - 1);
+        this.sleepManager.updateSleepingBar();
     }
 
     @EventHandler
@@ -88,37 +57,22 @@ public class PlayerListener implements Listener
         // return void if event is cancelled
         if (event.isCancelled()) return;
 
-        // take the player's class
         Player player = event.getPlayer();
 
-        // take world
         World world = player.getWorld();
 
-        // send message
-        this.sendMessage(player, this.enterBedMessage, player.getName(), "<playerName>");
+        if (this.sleepManager.isZeroSleepers() || (!this.sleepManager.isZeroSleepers() && !this.sleepManager.isShowSleepingBar()))
+            this.sleepManager.showSleepingBar(world.getPlayers());
 
-        // add players to display sleeping bar
-        if (sleepingBar.getPlayers().size() == 0 && (!this.skippingNight || !world.isClearWeather()))
-            for (Player p : world.getPlayers()) this.sleepingBar.addPlayer(p);
+        this.sleepManager.addSleeper();
 
-        if (this.maxSleepingPlayers <= 0) this.updateMaxSleepingPlayers(world.getPlayers().size());
+        if (this.sleepManager.isValidSkippingNight(world)) this.sleepManager.skipNight(world);
 
-        // add sleeping player
-        this.sleepingPlayersNum += 1;
+        this.sleepManager.updateSleepingBar();
 
-        this.updateSleepingBar();
-
-        // skip night
-        if (this.maxSleepingPlayers <= this.sleepingPlayersNum && !this.skippingNight)
-        {
-            this.skippingNight = true;
-
-            this.thunder = !world.isClearWeather();
-
-            this.removeSleepingBarWithDelay(30);
-
-            this.skipNight(world);
-        }
+        // send a message if it's night
+        if (this.sleepManager.isValidTimeToSleep(world))
+            this.messageSender.sendMessage(player, this.enterBedMessage, "<playerName>", player.getName());
     }
 
     @EventHandler
@@ -127,81 +81,18 @@ public class PlayerListener implements Listener
         // return void if event is cancelled
         if (event.isCancelled()) return;
 
-        // take player`s class
         Player player = event.getPlayer();
-        // take world
+
         World world = player.getWorld();
 
-        // sub sleeping player
-        if (this.sleepingPlayersNum > 0) this.sleepingPlayersNum -= 1;
+        this.sleepManager.subSleeper();
 
-        if (this.maxSleepingPlayers <= 0) this.updateMaxSleepingPlayers(world.getPlayers().size());
+        if (this.sleepManager.isZeroSleepers()) this.sleepManager.hideSleepingBar();
 
-        if ((world.getTime() >= this.morning) && (world.getTime() <= this.night)) this.sendMessage(player, this.exitBedMessage, player.getName(), "<playerName>");
-        else if (this.sleepingPlayersNum == 0 && !this.skippingNight) this.removeSleepingBarWithDelay(200);
+        this.sleepManager.updateSleepingBar();
 
-        // update sleeping bar progress
-        this.updateSleepingBar();
-    }
-
-    public void disable()
-    {
-        if (this.sleepingBar != null) this.sleepingBar.removeAll();
-    }
-
-    private void updateMaxSleepingPlayers(int playersNum)
-    {
-        // calculate the number of sleeping players to skip the night
-        this.maxSleepingPlayers = (int) (playersNum * this.percentagePlayersToSkipNight);
-        if (this.maxSleepingPlayers <= 0) this.maxSleepingPlayers = 1;
-    }
-
-    private void skipNight(World world)
-    {
-        new BukkitRunnable()
-        {
-            @Override
-            public void run()
-            {
-                world.setTime(morning);
-                if (thunder) world.setStorm(false);
-                skippingNight = false;
-            }
-        }.runTaskLater(this.plugin, 100);
-    }
-
-    private void removeSleepingBarWithDelay(long delay)
-    {
-        new BukkitRunnable()
-        {
-            @Override
-            public void run()
-            {
-                if (sleepingPlayersNum == 0 || skippingNight) sleepingBar.removeAll();
-            }
-        }.runTaskLater(this.plugin, delay);
-    }
-
-    private void updateSleepingBar()
-    {
-        try
-        {
-            // set sleeping bar progress
-            this.sleepingBar.setProgress((double) this.sleepingPlayersNum / this.maxSleepingPlayers);
-            this.sleepingBar.setTitle(this.sleepingBarTitle + " " + sleepingPlayersNum + "/" + this.maxSleepingPlayers);
-        }
-        catch (Exception ignored)
-        {
-        }
-    }
-
-    private void sendMessage(Player recipientPlayer, String text)
-    {
-        recipientPlayer.sendMessage(this.formatText.format(text));
-    }
-
-    private void sendMessage(Player recipientPlayer, String text, String var, String replacement)
-    {
-        recipientPlayer.sendMessage(this.formatText.format(text, var, replacement));
+        // send a message if it's morning
+        if (!this.sleepManager.isValidTimeToSleep(world))
+            this.messageSender.sendMessage(player, this.exitBedMessage, "<playerName>", player.getName());
     }
 }

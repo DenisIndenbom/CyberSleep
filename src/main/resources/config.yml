@@ -17,18 +17,21 @@
 # <ce> - yellow
 # <cf> - white
 
-# config version
-config_version: 1
-
-# messages
 messages:
-  helpMessage: This is a <c5>CyberSleepPlugin. <cf>The plugin helps to skip boring nights!
-  enterBedMessage: <c7>Good night <playerName>!
-  exitBedMessage: <c7>Good morning <playerName>!
-  reloadMessage: <c5>CyberSleepPlugin <cf>reloaded!
+  help_message: This is a <c5>CyberSleepPlugin. <cf>The plugin helps to skip boring nights!
+  enter_bed_message: <c7>Good night <playerName>!
+  exit_bed_message: <c7>Good morning <playerName>!
+  reload_message: <c5>CyberSleep <cf>reloaded!
+
+time:
+  morning: 0   # the time when the morning begins (ticks)
+  night: 13000 # the time when the night begins (ticks)
 
 sleeping_bar:
   title: <c9>Sleeping
   color: blue # blue, red, yellow, green, pink, purple - available colors
+  delay_hiding: 100 # delay hiding the bar (ticks)
 
-max_percent_of_sleeping_players: 0.3 # range from 0 to 1
+skip_night:
+  delay: 100 # delay in skipping the night (ticks)
+  players_sleeping_percentage: 0.3 # range from 0 to 1

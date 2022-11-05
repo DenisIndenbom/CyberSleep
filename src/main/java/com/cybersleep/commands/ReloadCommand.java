@@ -5,26 +5,26 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import com.cybersleep.CyberSleepPlugin;
-import com.cybersleep.messagesender.MessageSender;
+import com.cybersleep.CyberSleep;
+import com.cybersleep.utils.MessageSender;
 
 import org.jetbrains.annotations.NotNull;
 
 public class ReloadCommand implements CommandExecutor
 {
-    private final CyberSleepPlugin plugin;
+    private final CyberSleep plugin;
     private final String reloadMessage;
 
     private final MessageSender messageSender = new MessageSender();
 
-    public ReloadCommand(String reloadMessage, CyberSleepPlugin plugin)
+    public ReloadCommand(String reloadMessage, CyberSleep plugin)
     {
         this.reloadMessage = reloadMessage;
         this.plugin = plugin;
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, Command cmd, String label, String[] args)
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args)
     {
         if (!sender.isOp())
         {

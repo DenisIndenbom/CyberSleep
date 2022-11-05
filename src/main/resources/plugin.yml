@@ -1,13 +1,13 @@
-name: CyberSleepPlugin
-version: 1.1
-main: com.cybersleep.CyberSleepPlugin
+name: CyberSleep
+version: 2.0.0
+main: com.cybersleep.CyberSleep
 
 prefix: CyberSleep
 authors: [DenisIndenbom]
-description: This is a CyberSleepPlugin. The plugin helps to skip boring nights!
+description: This is a CyberSleep. The plugin helps to skip boring nights!
 
 commands:
   about_cybersleep:
-    usage: /cybersleep about
+    usage: /about_cybersleep
   reload_cybersleep:
-    usage: /cybersleep reload
+    usage: /reload_cybersleep

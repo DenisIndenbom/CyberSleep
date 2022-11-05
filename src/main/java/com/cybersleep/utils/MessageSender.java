@@ -1,8 +1,6 @@
-package com.cybersleep.messagesender;
+package com.cybersleep.utils;
 
 import org.bukkit.command.CommandSender;
-
-import com.cybersleep.formattext.FormatText;
 
 public class MessageSender
 {
@@ -19,5 +17,10 @@ public class MessageSender
         {
             sender.getServer().getLogger().info(newMessage);
         }
+    }
+
+    public void sendMessage(CommandSender sender, String message, String replaceable, String replacement)
+    {
+        this.sendMessage(sender, formatText.format(message, replaceable, replacement));
     }
 }
