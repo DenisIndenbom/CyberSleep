@@ -3,6 +3,7 @@ package com.cybersleep.SleepManagement;
 import com.cybersleep.utils.FormatText;
 
 import com.cybersleep.CyberSleep;
+
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.boss.BarColor;
@@ -75,7 +76,7 @@ public class SleepManager
     public void updateSleepingBar()
     {
         // calculate max sleepers
-        long maxSleepers = (long) ((double) this.players * this.skipPercentage);
+        long maxSleepers = Math.round(((double) this.players * this.skipPercentage));
         maxSleepers = Math.max(maxSleepers, 1);
 
         // calculate bar progress
@@ -94,7 +95,7 @@ public class SleepManager
     {return this.sleepingBar.getPlayers().size() > 0;}
 
     public boolean isValidTimeToSleep(@NotNull World world)
-    {return world.getTime() >= this.night || !world.isThundering();}
+    {return world.getTime() >= this.night || world.isThundering();}
 
     public boolean isValidSkippingNight(World world)
     {return ((double) this.sleepers / this.players) >= this.skipPercentage && isValidTimeToSleep(world);}

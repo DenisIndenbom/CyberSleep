@@ -37,6 +37,8 @@ public class PlayerListener implements Listener
     {
         Player player = event.getPlayer();
 
+        if (player == null) return;
+
         this.sleepManager.setPlayers(player.getWorld().getPlayers().size() + 1);
         this.sleepManager.updateSleepingBar();
 
