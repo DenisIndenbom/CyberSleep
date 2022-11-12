@@ -76,7 +76,7 @@ public class SleepManager
     public void updateSleepingBar()
     {
         // calculate max sleepers
-        long maxSleepers = Math.round(((double) this.players * this.skipPercentage));
+        long maxSleepers = (long) Math.ceil(((double) this.players * this.skipPercentage));
         maxSleepers = Math.max(maxSleepers, 1);
 
         // calculate bar progress
