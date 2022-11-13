@@ -10,7 +10,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import org.jetbrains.annotations.NotNull;
@@ -33,7 +33,7 @@ public class PlayerListener implements Listener
     }
 
     @EventHandler
-    public void onPLayerLogin(PlayerLoginEvent event)
+    public void onPLayerLogin(PlayerJoinEvent event)
     {
         Player player = event.getPlayer();
 
