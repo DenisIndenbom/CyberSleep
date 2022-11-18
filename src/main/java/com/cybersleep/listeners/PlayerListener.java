@@ -39,7 +39,7 @@ public class PlayerListener implements Listener
 
         if (player == null) return;
 
-        this.sleepManager.setPlayers(player.getWorld().getPlayers().size() + 1);
+        this.sleepManager.setPlayers(player.getWorld().getPlayers().size());
         this.sleepManager.updateSleepingBar();
 
         if (this.sleepManager.isShowSleepingBar() && this.sleepManager.isValidTimeToSleep(player.getWorld()))
