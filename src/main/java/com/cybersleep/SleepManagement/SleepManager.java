@@ -111,12 +111,12 @@ public class SleepManager
             @Override
             public void run()
             {
+                skippingNight = false;
                 if (!isValidSkippingNight(world)) return;
 
                 // skip night or storm
                 if (world.isThundering()) world.setStorm(false);
                 world.setTime(morning);
-                skippingNight = false;
 
                 // hide sleeping bar
                 sleepingBar.removeAll();
